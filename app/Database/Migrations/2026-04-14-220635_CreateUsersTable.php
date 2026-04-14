@@ -32,7 +32,7 @@ class CreateUsersTable extends Migration
                 'constraint'        => 64,
                 'null'              => true,
             ],
-            'create_at'     => [
+            'created_at'     => [
                 'type'              => 'DATETIME',
                 'null'              => true,
             ],
