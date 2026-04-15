@@ -112,4 +112,9 @@ class TaskController extends BaseController
                 'message'   => 'Task deleted.',
             ]);
     }
+
+    public function view()
+    {
+        return view('tasks/index');
+    }
 }
