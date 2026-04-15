@@ -2,22 +2,23 @@
 
 namespace App\Controllers;
 
-use App\Models\TaskModel;
+use App\Services\TaskService;
+use App\Repositories\TaskRepository;
 use CodeIgniter\HTTP\ResponseInterface;
 
 class TaskController extends BaseController
 {
-    protected TaskModel $taskModel;
+    protected TaskService $taskService;
 
     public function __construct()
     {
-        $this->taskModel = new TaskModel();
+        $this->taskService = new TaskService(new TaskRepository());
     }
 
     // GET /tasks
     public function index()
     {
-        $tasks = $this->taskModel->findAll();
+        $tasks = $this->taskService->getAllTasks();
 
         return $this->response->setJSON([
             'status'    => 'success',
@@ -28,87 +29,82 @@ class TaskController extends BaseController
     // GET /tasks/{id}
     public function show($id = null)
     {
-        $task = $this->taskModel->find($id);
+        $task = $this->taskService->getTask($id);
 
         if (!$task) {
-            return $this->response->setStatusCode(ResponseInterface::HTTP_NOT_FOUND)->setJSON([
-                'status'    => 'error',
-                'message'   => 'Task not found.',
-            ]);
+            return $this->response
+                ->setStatusCode(ResponseInterface::HTTP_NOT_FOUND)
+                ->setJSON([
+                    'status'    => 'error',
+                    'message'   => 'Task not found.',
+                ]);
         }
 
-        return $this->response->setJSON([
-            'status'    => 'success',
-            'data'      => $task,
-        ]);
+        return $this->response
+            ->setJSON([
+                'status'    => 'success',
+                'data'      => $task,
+            ]);
     }
 
     // POST /tasks
     public function create()
     {
         $data = $this->request->getJSON(true);
+        $task = $this->taskService->createTask($data);
 
-        if (!$this->taskModel->insert($data)) {
-            return $this->response->setStatusCode(ResponseInterface::HTTP_BAD_REQUEST)->setJSON([
-                'status'    => 'error',
-                'errors'    => $this->taskModel->errors(),
+        return $this->response
+            ->setStatusCode(ResponseInterface::HTTP_CREATED)
+            ->setJSON([
+                'status'    => 'success',
+                'data'      => $task,
             ]);
-        }
-
-        $task = $this->taskModel->find($this->taskModel->getInsertID());
-
-        return $this->response->setStatusCode(ResponseInterface::HTTP_CREATED)->setJSON([
-            'status'    => 'success',
-            'data'      => $task,
-        ]);
     }
 
     // PUT /tasks/{id}
     public function update($id = null)
     {
-        $task = $this->taskModel->find($id);
+        $task = $this->taskService->getTask($id);
 
         if (!$task) {
-            return $this->response->setStatusCode(ResponseInterface::HTTP_NOT_FOUND)->setJSON([
-                'status'    => 'error',
-                'message'   => 'Task not found.',
-            ]);
+            return $this->response
+                ->setStatusCode(ResponseInterface::HTTP_NOT_FOUND)
+                ->setJSON([
+                    'status'    => 'error',
+                    'message'   => 'Task not found.',
+                ]);
         }
 
         $data = $this->request->getJSON(true);
+        $task = $this->taskService->updateTask($id, $data);
 
-        if (!$this->taskModel->update($id, $data)) {
-            return $this->response->setStatusCode(ResponseInterface::HTTP_BAD_REQUEST)->setJSON([
-                'status'    => 'error',
-                'errors'    => $this->taskModel->errors(),
+        return $this->response
+            ->setJSON([
+                'status'    => 'success',
+                'data'      => $task,
             ]);
-        }
-
-        $task = $this->taskModel->find($id);
-
-        return $this->response->setJSON([
-            'status'    => 'success',
-            'data'      => $task,
-        ]);
     }
 
     // DELETE /tasks/{id}
     public function delete($id = null)
     {
-        $task = $this->taskModel->find($id);
+        $task = $this->taskService->getTask($id);
 
         if (!$task) {
-            return $this->response->setStatusCode(ResponseInterface::HTTP_NOT_FOUND)->setJSON([
-                'status'    => 'error',
-                'message'   => 'Task not found.',
-            ]);
+            return $this->response
+                ->setStatusCode(ResponseInterface::HTTP_NOT_FOUND)
+                ->setJSON([
+                    'status'    => 'error',
+                    'message'   => 'Task not found.',
+                ]);
         }
 
-        $this->taskModel->delete($id);
+        $this->taskService->deleteTask($id);
 
-        return $this->response->setJSON([
-            'status'    => 'success',
-            'message'   => 'Task deleted.',
-        ]);
+        return $this->response
+            ->setJSON([
+                'status'    => 'success',
+                'message'   => 'Task deleted.',
+            ]);
     }
 }

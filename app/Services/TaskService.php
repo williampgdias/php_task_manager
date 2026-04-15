@@ -1,5 +1,7 @@
 <?php
 
+namespace App\Services;
+
 use App\Interfaces\TaskRepositoryInterface;
 
 class TaskService
