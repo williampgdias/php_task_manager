@@ -13,18 +13,20 @@ class TaskService
         $this->repository = $repository;
     }
 
-    public function getAllTasks(): array
+    public function getAllTasks(int $userId): array
     {
-        return $this->repository->findAll();
+        return $this->repository->findAll($userId);
     }
 
-    public function getTask(int $id): ?array
+    public function getTask(int $id, int $userId): ?array
     {
-        return $this->repository->findById($id);
+        return $this->repository->findById($id, $userId);
     }
 
-    public function createTask(array $data): array
+    public function createTask(array $data, int $userID): array
     {
+        $data['user_id'] = $userID;
+
         if (empty($data['status'])) {
             $data['status'] = 'pending';
         }

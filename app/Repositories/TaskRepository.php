@@ -14,13 +14,21 @@ class TaskRepository implements TaskRepositoryInterface
         $this->model = new TaskModel();
     }
 
-    public function findAll(): array
+    public function findAll(int|null $userId = null): array
     {
+        if ($userId) {
+            return $this->model->where('user_id', $userId)->findAll();
+        }
+
         return $this->model->findAll();
     }
 
-    public function findById(int $id): ?array
+    public function findById(int $id, int|null $userId = null): ?array
     {
+        if ($userId) {
+            return $this->model->where('user_id', $userId)->find($id);
+        }
+
         return $this->model->find($id);
     }
 

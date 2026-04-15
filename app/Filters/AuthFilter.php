@@ -14,10 +14,12 @@ class AuthFilter implements FilterInterface
         $token = $request->getHeaderLine('Authorization');
 
         if (!$token) {
-            return service('response')->setStatusCode(ResponseInterface::HTTP_UNAUTHORIZED)->setJSON([
-                'status'    => 'error',
-                'message'   => 'Token required.',
-            ]);
+            return service('response')
+                ->setStatusCode(ResponseInterface::HTTP_UNAUTHORIZED)
+                ->setJSON([
+                    'status'    => 'error',
+                    'message'   => 'Token required.',
+                ]);
         }
 
         $token = str_replace('Bearer ', '', $token);
@@ -26,11 +28,15 @@ class AuthFilter implements FilterInterface
         $user = $userModel->where('api_token', $token)->first();
 
         if (!$user) {
-            return service('response')->setStatusCode(ResponseInterface::HTTP_UNAUTHORIZED)->setJSON([
-                'status'    => 'error',
-                'message'   => 'Invalid token.',
-            ]);
+            return service('response')
+                ->setStatusCode(ResponseInterface::HTTP_UNAUTHORIZED)
+                ->setJSON([
+                    'status'    => 'error',
+                    'message'   => 'Invalid token.',
+                ]);
         }
+
+        $request->user = $user;
     }
 
     public function after(RequestInterface $request, ResponseInterface $response, $arguments = null)

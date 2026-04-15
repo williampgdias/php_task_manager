@@ -18,7 +18,8 @@ class TaskController extends BaseController
     // GET /tasks
     public function index()
     {
-        $tasks = $this->taskService->getAllTasks();
+        $userId = $this->request->user['id'];
+        $tasks = $this->taskService->getAllTasks($userId);
 
         return $this->response->setJSON([
             'status'    => 'success',
@@ -29,7 +30,8 @@ class TaskController extends BaseController
     // GET /tasks/{id}
     public function show($id = null)
     {
-        $task = $this->taskService->getTask($id);
+        $userId = $this->request->user['id'];
+        $task = $this->taskService->getTask($id, $userId);
 
         if (!$task) {
             return $this->response
@@ -50,8 +52,9 @@ class TaskController extends BaseController
     // POST /tasks
     public function create()
     {
+        $userId = $this->request->user['id'];
         $data = $this->request->getJSON(true);
-        $task = $this->taskService->createTask($data);
+        $task = $this->taskService->createTask($data, $userId);
 
         return $this->response
             ->setStatusCode(ResponseInterface::HTTP_CREATED)
@@ -64,7 +67,8 @@ class TaskController extends BaseController
     // PUT /tasks/{id}
     public function update($id = null)
     {
-        $task = $this->taskService->getTask($id);
+        $userId = $this->request->user['id'];
+        $task = $this->taskService->getTask($id, $userId);
 
         if (!$task) {
             return $this->response
@@ -88,7 +92,8 @@ class TaskController extends BaseController
     // DELETE /tasks/{id}
     public function delete($id = null)
     {
-        $task = $this->taskService->getTask($id);
+        $userId = $this->request->user['id'];
+        $task = $this->taskService->getTask($id, $userId);
 
         if (!$task) {
             return $this->response
